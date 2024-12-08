@@ -1,7 +1,11 @@
-const { Client, Events } = require("discord.js");
-const getIP = require("./src/GetIP.js");
-const config = require("../../config.json");
-const dbUtils = require("./src/db/dbUtils.js");
+import { Client, Events } from "discord.js";
+import getIP from "./src/GetIP.js";
+import { insertarDato, obtenerPorIP } from "./src/db/dbUtils.js";
+import { readFileSync } from "fs";
+
+// Ruta del archivo JSON
+const configPath = new URL("../../config.json", import.meta.url);
+const config = JSON.parse(readFileSync(configPath));
 
 // crear un nuevo cliente de discord
 const client = new Client({
@@ -10,7 +14,6 @@ const client = new Client({
 
 const numero = Math.floor(Math.random() * 100000);
 const ipService = new getIP(numero);
-
 
 client.on(Events.ClientReady, async () => {
     console.log(`Conectado como ${client.user.username}!`);
@@ -58,6 +61,17 @@ async function generarEnlaces() {
     return enlace;
 }
 
+// Ejemplo de uso de las funciones de dbUtils.js
+async function ejemploUsoDB() {
+    // Insertar un dato
+    await insertarDato("coleccionEjemplo", { campo: "valor" });
+
+    // Obtener por IP
+    const existe = await obtenerPorIP("127.0.0.1");
+    console.log("Existe usuario con esa IP:", existe);
+}
+
+ejemploUsoDB();
 
 // ################################################################
 // ################################################################

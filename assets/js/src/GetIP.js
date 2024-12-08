@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import path from 'path';
+
 const app = express();
-const path = require('path');
 
 class GetIP {
     constructor(numero) {
@@ -23,4 +24,4 @@ class GetIP {
     }
 }
 
-module.exports = GetIP;
+export default GetIP;
