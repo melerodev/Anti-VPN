@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 
@@ -14,6 +15,9 @@ class GetIP {
                 ip_usuario = '127.0.0.1';
             }
             console.log(`New user with IP: ${ip_usuario}`);
+
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
 
             res.sendFile(path.join(__dirname, '../../../index.html'));
         });
