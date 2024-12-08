@@ -26,7 +26,10 @@ client.on(Events.ClientReady, async () => {
 // cuando un usuario se una al servidor
 client.on(Events.GuildMemberAdd, async (miembro) => {
     try {
-        await generarMensaje(miembro.user);
+        mensaje = await generarMensaje(miembro.user.tag);
+        setTimeout(() => {
+            mensaje.delete().catch(console.error);
+        }, 10000); // 10000 milisegundos = 10 segundos
     } catch (error) {
         console.log(`No se pudo enviar el mensaje a ${miembro.user.tag}:`, error);
     }
@@ -46,11 +49,24 @@ client.on(Events.MessageCreate, async (mensaje) => {
     }
 });
 
+client.on('message', async (mensaje) => {
+    if (mensaje.content === '!verificar') {
+        try {
+            const mensajeVerificacion = await generarMensaje(mensaje.author);
+            setTimeout(() => {
+                mensajeVerificacion.delete().catch(console.error);
+            }, 10000); // 10000 milisegundos = 10 segundos
+        } catch (error) {
+            console.log(`No se pudo enviar el mensaje a ${mensaje.author.tag}:`, error);
+        }
+    }
+});
+
 async function generarMensaje(author) {
     var mensajeVerificacion = "Hola, " + author.username + ". Para poder acceder al servidor tienes que verificarte, esto se hace por temas de seguridad y por el bienestar de la comunidad. \n" + await generarEnlaces();
     
     try {
-        return await author.send(mensajeVerificacion);
+        return await author.send(mensajeVerificacion); // Cambié author.tag a author
     } catch (error) {
         console.log(`No se pudo enviar el mensaje a ${author.tag}:`, error);
     }
@@ -61,17 +77,6 @@ async function generarEnlaces() {
     return enlace;
 }
 
-// Ejemplo de uso de las funciones de dbUtils.js
-async function ejemploUsoDB() {
-    // Insertar un dato
-    await insertarDato("coleccionEjemplo", { campo: "valor" });
-
-    // Obtener por IP
-    const existe = await obtenerPorIP("127.0.0.1");
-    console.log("Existe usuario con esa IP:", existe);
-}
-
-ejemploUsoDB();
 
 // ################################################################
 // ################################################################
