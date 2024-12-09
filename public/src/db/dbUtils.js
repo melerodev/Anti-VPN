@@ -14,9 +14,9 @@ export async function insertarDato(coleccion, datos) {
     try {
         // Inserta los datos en la colección especificada
         const docRef = await addDoc(collection(db, coleccion), datos);
-        console.log("Documento insertado con ID:", docRef.id);
+        console.log("Database | Documento insertado con ID:", docRef.id);
     } catch (error) {
-        console.error("Error al insertar el dato:", error);
+        console.error("Database | Error al insertar el dato:", error);
     }
 }
 
@@ -29,12 +29,12 @@ export async function obtenerPorIP(ip) {
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
-            console.log("No se encontraron usuarios con la IP:", ip);
+            console.log("Database | No se encontraron usuarios con la IP:", ip);
         } else {
             existe = true;
         }
     } catch (error) {
-        console.error("Error al realizar la consulta:", error);
+        console.error("Database | Error al realizar la consulta:", error);
     }
     return existe;
 }

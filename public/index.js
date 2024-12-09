@@ -1,10 +1,10 @@
 import { Client, Events } from "discord.js";
 import getIP from "./src/GetIP.js";
-import { insertarDato, obtenerPorIP } from "./src/db/dbUtils.js";
+//import { insertarDato, obtenerPorIP } from "./src/db/dbUtils.js";
 import { readFileSync } from "fs";
 
 // Ruta del archivo JSON
-const configPath = new URL("../../config.json", import.meta.url);
+const configPath = new URL("../config.json", import.meta.url);
 const config = JSON.parse(readFileSync(configPath));
 
 // Crear un nuevo cliente de discord
@@ -13,7 +13,7 @@ const client = new Client({
 });
 
 client.on(Events.ClientReady, async () => {
-    console.log(`Conectado como ${client.user.username}!`);
+    console.log(`index    | Conectado como ${client.user.username}!`);
 });
 
 // ################################################################
@@ -31,7 +31,7 @@ client.on(Events.GuildMemberAdd, async (miembro) => {
             mensaje.delete().catch(console.error);
         }, 10000); // 10000 milisegundos = 10 segundos
     } catch (error) {
-        console.log(`No se pudo enviar el mensaje a ${miembro.user.username}:`, error);
+        console.log(`index    | No se pudo enviar el mensaje a ${miembro.user.username}:`, error);
     }
 });
 
@@ -48,7 +48,7 @@ client.on(Events.MessageCreate, async (mensaje) => {
                 mensajeEnviado.delete().catch(console.error);
             }, 10000); // 10000 milisegundos = 10 segundos
         } catch (error) {
-            console.log(`No se pudo enviar el mensaje a ${mensaje.author.username}:`, error);
+            console.log(`index    | No se pudo enviar el mensaje a ${mensaje.author.username}:`, error);
         }
     }
 });
@@ -59,7 +59,7 @@ async function generarMensaje(nombre ,enlaces) {
 }
 
 async function generarEnlaces(numero) {
-    var enlace = " https://d51a-94-73-40-169.ngrok-free.app/" + numero;
+    var enlace = "https://fd83-94-73-40-169.ngrok-free.app/" + numero;
     return enlace;
 }
 

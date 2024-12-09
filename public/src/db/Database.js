@@ -5,7 +5,7 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { readFileSync } from "fs";
 
 // Ruta del archivo JSON
-const configPath = new URL("../../../../config.json", import.meta.url);
+const configPath = new URL("../../../config.json", import.meta.url);
 const config = JSON.parse(readFileSync(configPath));
 
 class Database {
@@ -32,11 +32,11 @@ class Database {
         try {
             // Escribe un documento en Firestore
             await setDoc(doc(this.db, "testCollection", "testDoc"), {
-                prueba: "Conexión exitosa",
+                prueba: "Database | Conexión exitosa",
             });
-            console.log("¡Conexión a Firebase exitosa!");
+            console.log("Database | ¡Conexión a Firebase exitosa!");
         } catch (error) {
-            console.error("Error al conectar con Firebase:", error);
+            console.error("Database | Error al conectar con Firebase:", error);
         }
     }
 }

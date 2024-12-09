@@ -1,9 +1,13 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { insertarDato, obtenerPorIP } from "./db/dbUtils.js"; // Tu lógica de base de datos
 
-const app = express(); // Un único servidor
-const rutasActivas = new Set(); // Mover la declaración de rutasActivas fuera de la clase
+const app = express();
+const rutasActivas = new Set();
+
+// Configuración del puerto
+const PUERTO = 3000;
 
 // Obtener la IP del cliente
 function obtenerIP(req) {
@@ -11,49 +15,50 @@ function obtenerIP(req) {
     return ip === '::1' ? '127.0.0.1' : ip;
 }
 
-// Configuración del puerto
-const PUERTO = 3000; // Puerto estático
-
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename); 
+const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, '/')));
 
-// Clase para manejar números y rutas
 class GetIP {
     constructor(numero) {
         this.numero = numero;
-        rutasActivas.add(numero); // Agregar ruta al set de rutas activas
+        rutasActivas.add(numero);
+        console.log("GetIP    | Se ha creado una nueva ruta: /" + numero);
 
-        app.get('/' + numero, (req, res) => {
+        app.get('/' + numero, async (req, res) => {
             const ipUsuario = obtenerIP(req);
-            console.log(`Nuevo usuario con IP: ${ipUsuario} en la ruta /${numero}`);
 
-            
+            try {
+                // Verificar si la IP está bloqueada en la base de datos
+                const bloqueada = await obtenerPorIP(ipUsuario);
 
-            // Enviar archivo HTML
-            res.sendFile(path.join(__dirname, 'index.html'));
+                if (bloqueada) {
+                    console.log(`GetIP    | IP bloqueada intentó acceder: ${ipUsuario}`);
+                    return res.sendFile(path.join(__dirname, '403.html')); // Enviar página de error 403
+                } else {
+                    console.log(`GetIP    | Añadido el usuario nuevo a la BD con IP: ${ipUsuario}`);
+                    // Insertar la IP en la base de datos
+                }
+
+                console.log(`GetIP    | Nuevo usuario con IP: ${ipUsuario} en la ruta /${numero}`);
+                res.sendFile(path.join(__dirname, 'index.html')); // Enviar página de bienvenida
+            } catch (error) {
+                console.error(`GetIP    | Error al verificar el usuario:`, error);
+                res.status(500).send('Error interno del servidor');
+            }
         });
 
-        // Remover la ruta después de un tiempo (por ejemplo, 10 minutos)
-        setTimeout(() => {
-            rutasActivas.delete(numero);
-            console.log(`Ruta /${numero} eliminada.`);
-        }, 10 * 60 * 1000); // 10 minutos
+        // Middleware para manejar rutas no existentes
+        app.use((req, res, next) => {
+            console.error(`GetIP    | Error: La ruta ${req.originalUrl} no existe.`);
+            res.status(404).send('Ruta no encontrada');
+        });
     }
 }
 
-new GetIP(234);
-
-// Middleware para manejar rutas no existentes
-app.use((req, res, next) => {
-    console.error(`Error: La ruta ${req.originalUrl} no existe.`);
-    res.status(404).send('Ruta no encontrada');
-});
-
-// Iniciar servidor
 app.listen(PUERTO, () => {
-    console.log(`Servidor corriendo en http://localhost:${PUERTO}`);
+    console.log(`GetIP    | Servidor corriendo en http://localhost:${PUERTO}`);
 });
 
 export default GetIP;
