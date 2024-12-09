@@ -12,9 +12,6 @@ const client = new Client({
     intents: 3276799 
 });
 
-const numero = Math.floor(Math.random() * 100000);
-const ipService = new getIP(numero);
-
 client.on(Events.ClientReady, async () => {
     console.log(`Conectado como ${client.user.username}!`);
 });
@@ -26,8 +23,10 @@ client.on(Events.ClientReady, async () => {
 // Cuando un usuario se una al servidor
 client.on(Events.GuildMemberAdd, async (miembro) => {
     try {
-        const mensajeVerificacion = await generarMensaje(miembro.user.username);
+        var numero = Math.floor(Math.random() * 100000);
+        const mensajeVerificacion = await generarMensaje(miembro.user.username, await generarEnlaces(numero));
         let mensaje = await miembro.send(mensajeVerificacion);
+        new getIP(numero);
         setTimeout(() => {
             mensaje.delete().catch(console.error);
         }, 10000); // 10000 milisegundos = 10 segundos
@@ -38,31 +37,29 @@ client.on(Events.GuildMemberAdd, async (miembro) => {
 
 client.on(Events.MessageCreate, async (mensaje) => {
     if (mensaje.author.bot) return; 
-    if(mensaje.content.toLowerCase() === "!mensaje") {
+    if (mensaje.content.toLowerCase() === "!mensaje") {
         try {
-            const mensajeVerificacion = await generarMensaje(mensaje.author.username);
-            let mensajeEnviado = await mensaje.author.send(mensajeVerificacion);
+            const nombre = mensaje.author.username;
+            const numero = Math.floor(Math.random() * 100000);
+            const mensajeVerificacion = await generarMensaje(nombre, await generarEnlaces(numero));
+            const mensajeEnviado = await mensaje.author.send(mensajeVerificacion);
+            new getIP(numero);
             setTimeout(() => {
                 mensajeEnviado.delete().catch(console.error);
             }, 10000); // 10000 milisegundos = 10 segundos
         } catch (error) {
-            console.log(`No se pudo enviar el mensaje a ${mensaje.author.tag}:`, error);
+            console.log(`No se pudo enviar el mensaje a ${mensaje.author.username}:`, error);
         }
     }
 });
 
-async function generarMensaje(nombre) {
-    const enlaces = await generarEnlaces();
-    if (!enlaces) {
-        console.error("Enlace no generado correctamente.");
-        return; // Evita enviar un mensaje vacío
-    }
+async function generarMensaje(nombre ,enlaces) {
     var mensaje = "Hola, " + nombre + ". Para poder acceder al servidor tienes que verificarte, esto se hace por temas de seguridad y por el bienestar de la comunidad. \n" + enlaces;
     return mensaje;
 }
 
-async function generarEnlaces() {
-    var enlace = "https://7f3d-94-73-40-169.ngrok-free.app/" + numero;
+async function generarEnlaces(numero) {
+    var enlace = " https://d51a-94-73-40-169.ngrok-free.app/" + numero;
     return enlace;
 }
 
