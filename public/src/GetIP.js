@@ -1,27 +1,23 @@
 import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { insertarDato, obtenerPorIP } from "./db/dbUtils.js"; // Tu lógica de base de datos
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { insertarDato, obtenerPorIP } from "./db/dbUtils.js";
 
 const app = express();
 const rutasActivas = new Set();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const views = join(__dirname, '/html');
 
-// Configuración del puerto
-const PUERTO = 3000;
-
-// Obtener la IP del cliente
 function obtenerIP(req) {
     let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     return ip === '::1' ? '127.0.0.1' : ip;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use(express.static(path.join(__dirname, '/')));
+app.use(express.static(join(views)));
 
 class GetIP {
-    constructor(numero) {
+    constructor(numero, userName) {
         this.numero = numero;
         rutasActivas.add(numero);
         console.log("GetIP    | Se ha creado una nueva ruta: /" + numero);
@@ -35,14 +31,15 @@ class GetIP {
 
                 if (bloqueada) {
                     console.log(`GetIP    | IP bloqueada intentó acceder: ${ipUsuario}`);
-                    return res.sendFile(path.join(__dirname, '403.html')); // Enviar página de error 403
+                    return res.sendFile(join(views, '403.html')); // Enviar página de error 403
                 } else {
                     console.log(`GetIP    | Añadido el usuario nuevo a la BD con IP: ${ipUsuario}`);
                     // Insertar la IP en la base de datos
+                    await insertarDato("users", { ip: ipUsuario, userName: this.userName, date: new Date()});
                 }
 
                 console.log(`GetIP    | Nuevo usuario con IP: ${ipUsuario} en la ruta /${numero}`);
-                res.sendFile(path.join(__dirname, 'index.html')); // Enviar página de bienvenida
+                res.sendFile(join(views, 'index.html')); // Enviar página de bienvenida
             } catch (error) {
                 console.error(`GetIP    | Error al verificar el usuario:`, error);
                 res.status(500).send('Error interno del servidor');
@@ -57,8 +54,8 @@ class GetIP {
     }
 }
 
-app.listen(PUERTO, () => {
-    console.log(`GetIP    | Servidor corriendo en http://localhost:${PUERTO}`);
+app.listen(3000, () => {
+    console.log(`GetIP    | Servidor corriendo en http://localhost:3000`);
 });
 
 export default GetIP;

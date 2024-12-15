@@ -24,9 +24,9 @@ export async function obtenerPorIP(ip) {
     let existe = false;
     try {
         // Crea una consulta que filtre los documentos donde 'ip' sea igual al valor dado
-        const q = query(collection(db, "users"), where("ip", "==", ip));
+        const q = query(collection(db, "bans"), where("ip", "==", ip));
         
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(q); // Obtiene los documentos que cumplen con la consulta
 
         if (querySnapshot.empty) {
             console.log("Database | No se encontraron usuarios con la IP:", ip);
