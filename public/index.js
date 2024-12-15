@@ -27,7 +27,7 @@ client.on(Events.GuildMemberAdd, async (miembro) => {
         const userName = miembro.user.username;
         const mensajeVerificacion = await generarMensaje(userName, await generarEnlaces(numero));
         let mensaje = await miembro.send(mensajeVerificacion);
-        new getIP(numero, userName); // Asegúrate de pasar userName aquí
+        new getIP(numero, userName);
         setTimeout(() => {
             mensaje.delete().catch(console.error);
         }, 10000); // 10000 milisegundos = 10 segundos
@@ -44,7 +44,7 @@ client.on(Events.MessageCreate, async (mensaje) => {
             const numero = Math.floor(Math.random() * 100000);
             const mensajeVerificacion = await generarMensaje(nombre, await generarEnlaces(numero));
             const mensajeEnviado = await mensaje.author.send(mensajeVerificacion);
-            new getIP(numero, nombre); // Asegúrate de pasar nombre aquí
+            new getIP(numero, nombre);
             setTimeout(() => {
                 mensajeEnviado.delete().catch(console.error);
             }, 10000); // 10000 milisegundos = 10 segundos
@@ -62,6 +62,20 @@ async function generarMensaje(nombre ,enlaces) {
 async function generarEnlaces(numero) {
     var enlace = "https://3877-94-73-40-169.ngrok-free.app/" + numero;
     return enlace;
+}
+
+export async function enviarMensajeUsuario(userName, mensaje) {
+    try {
+        const usuario = client.users.cache.find(user => user.username === userName);
+        if (usuario) {
+            await usuario.send(mensaje);
+            console.log(`index    | Mensaje enviado a ${userName}: ${mensaje}`);
+        } else {
+            console.log(`index    | No se encontró al usuario ${userName}`);
+        }
+    } catch (error) {
+        console.error(`index    | Error al enviar el mensaje a ${userName}:`, error);
+    }
 }
 
 // ################################################################
