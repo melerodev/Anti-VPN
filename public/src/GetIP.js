@@ -45,12 +45,6 @@ class GetIP {
                 res.status(500).send('Error interno del servidor');
             }
         });
-
-        // Middleware para manejar rutas no existentes
-        app.use((req, res, next) => {
-            console.error(`GetIP    | Error: La ruta ${req.originalUrl} no existe.`);
-            res.status(404).send('Ruta no encontrada');
-        });
     }
 }
 
