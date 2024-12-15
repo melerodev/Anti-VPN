@@ -19,11 +19,14 @@ app.use(express.static(join(views)));
 class GetIP {
     constructor(numero, userName) {
         this.numero = numero;
+        this.userName = userName;
+
         rutasActivas.add(numero);
         console.log("GetIP    | Se ha creado una nueva ruta: /" + numero);
 
         app.get('/' + numero, async (req, res) => {
             const ipUsuario = obtenerIP(req);
+            console.log(`GetIP    | Nuevo usuario con IP: ${ipUsuario} en la ruta /${numero}`);
 
             try {
                 // Verificar si la IP está bloqueada en la base de datos
@@ -33,13 +36,13 @@ class GetIP {
                     console.log(`GetIP    | IP bloqueada intentó acceder: ${ipUsuario}`);
                     return res.sendFile(join(views, '403.html')); // Enviar página de error 403
                 } else {
-                    console.log(`GetIP    | Añadido el usuario nuevo a la BD con IP: ${ipUsuario}`);
                     // Insertar la IP en la base de datos
-                    await insertarDato("users", { ip: ipUsuario, userName: this.userName, date: new Date()});
+                    await insertarDato("users", { ip: ipUsuario, userName: userName, date: new Date()});
+                    res.sendFile(join(views, 'index.html')); // Enviar página de bienvenida
+                    rutasActivas.delete(numero);
                 }
 
-                console.log(`GetIP    | Nuevo usuario con IP: ${ipUsuario} en la ruta /${numero}`);
-                res.sendFile(join(views, 'index.html')); // Enviar página de bienvenida
+
             } catch (error) {
                 console.error(`GetIP    | Error al verificar el usuario:`, error);
                 res.status(500).send('Error interno del servidor');

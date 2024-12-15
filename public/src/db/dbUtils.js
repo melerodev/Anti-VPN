@@ -14,6 +14,7 @@ export async function insertarDato(coleccion, datos) {
     try {
         // Inserta los datos en la colección especificada
         const docRef = await addDoc(collection(db, coleccion), datos);
+        console.log("Database | Añadiendo nuevo usuario a la BD con la IP:", datos.ip);
         console.log("Database | Documento insertado con ID:", docRef.id);
     } catch (error) {
         console.error("Database | Error al insertar el dato:", error);
@@ -29,7 +30,7 @@ export async function obtenerPorIP(ip) {
         const querySnapshot = await getDocs(q); // Obtiene los documentos que cumplen con la consulta
 
         if (querySnapshot.empty) {
-            console.log("Database | No se encontraron usuarios con la IP:", ip);
+            console.log("Database | No se han encontraron usuarios baneados en la BD con la IP:", ip);
         } else {
             existe = true;
         }
