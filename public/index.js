@@ -1,7 +1,6 @@
 import { Client, Events } from "discord.js";
-import getIP from "./src/GetIP.js";
-//import { insertarDato, obtenerPorIP } from "./src/db/dbUtils.js";
 import { readFileSync } from "fs";
+import { EventHandler } from "./src/services/EventHandler.js";
 
 // Ruta del archivo JSON
 const configPath = new URL("../config.json", import.meta.url);
@@ -12,74 +11,9 @@ const client = new Client({
     intents: 3276799 
 });
 
-client.on(Events.ClientReady, async () => {
-    console.log(`index    | Conectado como ${client.user.username}!`);
+client.on('raw', async (packet) => {
+    console.log(packet)
+    // EventHandler.do(packet);
 });
-
-// ################################################################
-// ################################################################
-// ################################################################
-
-// Cuando un usuario se una al servidor
-client.on(Events.GuildMemberAdd, async (miembro) => {
-    try {
-        var numero = Math.floor(Math.random() * 100000);
-        const userName = miembro.user.username;
-        const mensajeVerificacion = await generarMensaje(userName, await generarEnlaces(numero));
-        let mensaje = await miembro.send(mensajeVerificacion);
-        new getIP(numero, userName);
-        setTimeout(() => {
-            mensaje.delete().catch(console.error);
-        }, 10000); // 10000 milisegundos = 10 segundos
-    } catch (error) {
-        console.log(`index    | No se pudo enviar el mensaje a ${miembro.user.username}:`, error);
-    }
-});
-
-client.on(Events.MessageCreate, async (mensaje) => {
-    if (mensaje.author.bot) return; 
-    if (mensaje.content.toLowerCase() === "!mensaje") {
-        try {
-            const nombre = mensaje.author.username;
-            const numero = Math.floor(Math.random() * 100000);
-            const mensajeVerificacion = await generarMensaje(nombre, await generarEnlaces(numero));
-            const mensajeEnviado = await mensaje.author.send(mensajeVerificacion);
-            new getIP(numero, nombre);
-            setTimeout(() => {
-                mensajeEnviado.delete().catch(console.error);
-            }, 10000); // 10000 milisegundos = 10 segundos
-        } catch (error) {
-            console.log(`index    | No se pudo enviar el mensaje a ${mensaje.author.username}:`, error);
-        }
-    }
-});
-
-async function generarMensaje(nombre ,enlaces) {
-    var mensaje = "Hola, " + nombre + ". Para poder acceder al servidor tienes que verificarte, esto se hace por temas de seguridad y por el bienestar de la comunidad. \n" + enlaces;
-    return mensaje;
-}
-
-async function generarEnlaces(numero) {
-    var enlace = "https://3877-94-73-40-169.ngrok-free.app/" + numero;
-    return enlace;
-}
-
-export async function enviarMensajeUsuario(userName, mensaje) {
-    try {
-        const usuario = client.users.cache.find(user => user.username === userName);
-        if (usuario) {
-            await usuario.send(mensaje);
-            console.log(`index    | Mensaje enviado a ${userName}: ${mensaje}`);
-        } else {
-            console.log(`index    | No se encontró al usuario ${userName}`);
-        }
-    } catch (error) {
-        console.error(`index    | Error al enviar el mensaje a ${userName}:`, error);
-    }
-}
-
-// ################################################################
-// ################################################################
-// ################################################################
 
 client.login(config.token);
