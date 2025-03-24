@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { DeployCommands } from "./deployCommands.js";
 
-dotenv.config({ path: join(fileURLToPath(import.meta.url), "../.env") });
+dotenv.config();
 
 // Configuración del bot
 const client = new Client({
