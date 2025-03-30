@@ -3,7 +3,7 @@ import { readdirSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import { DeployCommands } from "./deployCommands.js";
+import { DeployCommands } from "./DeployCommands.js";
 
 dotenv.config();
 
