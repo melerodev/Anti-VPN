@@ -18,6 +18,7 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 
 app.get('/', (req, res) => {
     res.redirect('/login');
+    // res.sendFile('/var/www/html/anti-vpn/layouts-landing-page/V1/index.html');
 });
 
 app.get('/login', (req, res) => {
